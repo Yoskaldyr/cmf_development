@@ -1,13 +1,14 @@
 <?php
 
 /**
- * Data writer for admin templates.
+ * Data writer for phrases.
  *
  * @package CMF_Development
  * @author  Yoskaldyr <yoskaldyr@gmail.com>
  */
-class CMF_Development_DataWriter_AdminTemplate extends XFCP_CMF_Development_DataWriter_AdminTemplate
+class CMF_Development_DataWriter_Phrase extends XFCP_CMF_Development_DataWriter_Phrase
 {
+
 	/**
 	 * Helper to get the developer data output directory only if it is enabled
 	 * and applicable to this situation.
@@ -29,16 +30,26 @@ class CMF_Development_DataWriter_AdminTemplate extends XFCP_CMF_Development_Data
 	protected function _getDevOutputDirForAddonId($addOnId = '')
 	{
 		$devel = XenForo_Application::get('cmfDevelopment');
+		$languageId = $this->get('language_id');
 		if (!$devel || !$addOnId)
 		{
 			return parent::_getDevOutputDir();
 		}
-		else if ($addOnId == 'XenForo')
+		else if ($languageId == 0) //master language
 		{
-			return $devel['createOnImport'] ? $this->_getAdminTemplateModel()->getAdminTemplateDevelopmentDirectory() : parent::_getDevOutputDir();
+			if ($addOnId == 'XenForo')
+			{
+				return $devel['createOnImport'] ? $this->_getPhraseModel()->getPhraseDevelopmentDirectory() : parent::_getDevOutputDir();
+			}
+			else
+			{
+				return ($phrasePath = CMF_Development_Helper_File::getSubPathByAddOnId($addOnId, 'phrases')) ? $phrasePath : '';
+			}
 		}
-
-		return ($templatePath = CMF_Development_Helper_File::getSubPathByAddOnId($addOnId, 'admin_templates')) ? $templatePath : '';
+		else
+		{
+			return ($phrasePath = CMF_Development_Helper_File::getAddOnLanguagePathByLanguageId($languageId, $addOnId)) ? $phrasePath : '';
+		}
 	}
 
 	/**

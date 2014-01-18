@@ -17,19 +17,14 @@ class CMF_Development_Listener
 				array(
 					//model
 					'XenForo_Model_AdminTemplate' => 'CMF_Development_Model_AdminTemplate',
+					'XenForo_Model_EmailTemplate' => 'CMF_Development_Model_EmailTemplate',
 					'XenForo_Model_Template' => 'CMF_Development_Model_Template',
-					//'XenForo_Model_Thread' => 'CMF_Thread_Model_Thread',
-					//'XenForo_Model_Post' => 'CMF_Thread_Model_Post',
-					//route prefix
-					//'XenForo_Route_Prefix_Threads' => 'CMF_Thread_Route_Prefix_Threads',
-					//view
-					//'XenForo_ViewPublic_Thread_View' => 'CMF_Thread_ViewPublic_Thread_View',
-					//'XenForo_ViewPublic_Thread_Reply' => 'CMF_Thread_ViewPublic_Thread_Reply',
+					'XenForo_Model_Phrase' => 'CMF_Development_Model_Phrase',
 					//datawriter'
 					'XenForo_DataWriter_AdminTemplate' => 'CMF_Development_DataWriter_AdminTemplate',
-					//controller
-					//'XenForo_ControllerPublic_Thread' => 'CMF_Thread_ControllerPublic_Thread',
-					//'XenForo_ControllerPublic_Post' => 'CMF_Thread_ControllerPublic_Post'
+					'XenForo_DataWriter_EmailTemplate' => 'CMF_Development_DataWriter_EmailTemplate',
+					'XenForo_DataWriter_Template' => 'CMF_Development_DataWriter_Template',
+					'XenForo_DataWriter_Phrase' => 'CMF_Development_DataWriter_Phrase',
 				)
 			);
 

@@ -58,6 +58,7 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 	 *                              'dir' => 'style_repos',
 	 *                              'map' => array(
 	 *                                  1 => 'my_custom_style' //style integer_id => path
+	 *                                  '1-SomeAddonId' => 'addonId_my_custom_style' // style_id-addon_id => path
 	 *                              )
 	 *                          ),
 	 *                          //custom languages configuraton
@@ -65,6 +66,7 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 	 *                              'dir' => '',
 	 *                              'map' => array(
 	 *                                  2 => 'custom_language_Russian' //language integer_id => path
+	 *                                  '2-SomeAddonId' => 'addonId_language_Russian' // language_id-addon_id => path
 	 *                              )
 	 *                          ),
 	 *                          //configure override default XenForo 'file_output'
@@ -91,7 +93,7 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 						{
 							$dir = $config[$type]['dir'];
 							$this->_config[$type]['dir'] = ($dir && ($dir = rtrim(trim((string)$dir), '/')) && @is_readable($dir) && @is_dir($dir)) ? $dir : '';
-							if ($typeConfig['dir'] && isset($config[$type]['map']) && $config[$type]['map'] && is_array($config[$type]['map']))
+							if ($this->_config[$type]['dir'] && isset($config[$type]['map']) && $config[$type]['map'] && is_array($config[$type]['map']))
 							{
 								$this->_config[$type]['map'] = $config[$type]['map'] + $typeConfig['map'];
 							}
