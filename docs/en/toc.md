@@ -6,7 +6,7 @@ Common difficulties you'll face while doing addon development in XenForo
 Developers often face these problems during the development process in XenForo:
 
  1. You can't use VCS (Version control systems) for your addons because all your scripts are located inside XenForo libraries tree.
- 2. You can't use VSC for templates and phrases.
+ 2. You can't use VCS for templates and phrases.
 
 
 
