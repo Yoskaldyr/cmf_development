@@ -11,7 +11,7 @@
  */
 class CMF_Development_Autoloader extends CMF_Core_Autoloader
 {
-	protected $_config = array(
+	protected static $_config = array(
 		'addon' => array(
 			'dir' => '',
 		    'map' => array()
@@ -36,7 +36,7 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 
 	public function getConfig()
 	{
-		return $this->_config;
+		return self::$_config;
 	}
 
 	/**
@@ -83,7 +83,7 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 	{
 		if ($config && is_array($config))
 		{
-			foreach ($this->_config as $type => $typeConfig)
+			foreach (self::$_config as $type => $typeConfig)
 			{
 				if (isset($config[$type]))
 				{
@@ -92,16 +92,16 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 						if (isset($config[$type]['dir']))
 						{
 							$dir = $config[$type]['dir'];
-							$this->_config[$type]['dir'] = ($dir && ($dir = rtrim(trim((string)$dir), '/')) && @is_readable($dir) && @is_dir($dir)) ? $dir : '';
-							if ($this->_config[$type]['dir'] && isset($config[$type]['map']) && $config[$type]['map'] && is_array($config[$type]['map']))
+							self::$_config[$type]['dir'] = ($dir && ($dir = rtrim(trim((string)$dir), '/')) && @is_readable($dir) && @is_dir($dir)) ? $dir : '';
+							if (self::$_config[$type]['dir'] && isset($config[$type]['map']) && $config[$type]['map'] && is_array($config[$type]['map']))
 							{
-								$this->_config[$type]['map'] = $config[$type]['map'] + $typeConfig['map'];
+								self::$_config[$type]['map'] = $config[$type]['map'] + $typeConfig['map'];
 							}
 						}
 					}
 					else if (is_scalar($typeConfig) && is_scalar($config[$type]))
 					{
-						$this->_config[$type] = $config[$type];
+						self::$_config[$type] = $config[$type];
 					}
 				}
 			}
@@ -138,37 +138,60 @@ class CMF_Development_Autoloader extends CMF_Core_Autoloader
 			return false;
 		}
 
-		if ($this->_config['addon']['dir'])
+		if (self::$_config['addon']['dir'])
 		{
 			
 			$chunks = explode('_', $class);
-			if (sizeof($chunks) > 1)
+			$count = sizeof($chunks);
+			if ($count > 1)
 			{
-				//shot addon prefix (only addonName)
-				$classPrefix = $chunks[0];
-				$dir = $this->_config['addon']['dir'] . '/' . (!empty($this->_config['addon']['map'][$classPrefix]) ? $this->_config['addon']['map'][$classPrefix] : strtolower($classPrefix));
-				if (sizeof($chunks)>2)
+				$classPrefixes = array();
+				for ($i = min(3, $count - 1); $i > 0; $i--)
 				{
-					//long addon prefix (providerName_addonName)
-					$classPrefix = $chunks[0] . '_' . $chunks[1];
-					$dirLong = $this->_config['addon']['dir'] . '/' . (!empty($this->_config['addon']['map'][$classPrefix]) ? $this->_config['addon']['map'][$classPrefix] : strtolower($classPrefix));
-					if (file_exists($dirLong))
+					$classPrefixes[] = implode('_', array_slice($chunks, 0, $i));
+				}
+				$dir = '';
+				//Checks for addon map
+				foreach ($classPrefixes as $classPrefix)
+				{
+					if (!empty(self::$_config['addon']['map'][$classPrefix]))
 					{
-						$dir = $dirLong;
+						$dirLong = self::$_config['addon']['dir'] . '/' . self::$_config['addon']['map'][$classPrefix];
+						if (file_exists($dirLong) && is_dir($dirLong))
+						{
+							$dir = $dirLong;
+							break;
+						}
 					}
 				}
-				// Short convention with _Extra dir
-				$fileShort = $dir . '/' . implode('/', array_slice($chunks, 2)) . '.php';
-				// Long convention with full path (upload/library)
-				$fileLong = $dir . '/upload/library/' . implode('/', $chunks) . '.php';
-
-				if (file_exists($fileLong))
+				if (!$dir)
 				{
-					return $fileLong;
+					//Checks for all addon prefixes: providerName_addonGroup_addonName, providerName_addonName, addonName
+					foreach ($classPrefixes as $classPrefix)
+					{
+						$dirLong = self::$_config['addon']['dir'] . '/' . strtolower($classPrefix);
+						if (file_exists($dirLong) && is_dir($dirLong))
+						{
+							$dir = $dirLong;
+							break;
+						}
+					}
 				}
-				else if (file_exists($fileShort))
+				if ($dir)
 				{
-					return $fileShort;
+					// Long convention with full path (upload/library)
+					$file = $dir . '/upload/library/' . implode('/', $chunks) . '.php';
+					if (file_exists($file))
+					{
+						return $file;
+					}
+
+					// Short convention with _Extra dir
+					$file = $dir . '/' . implode('/', array_slice($chunks, 2)) . '.php';
+					if (file_exists($file))
+					{
+						return $file;
+					}
 				}
 			}
 		}
